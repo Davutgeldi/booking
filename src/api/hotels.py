@@ -7,7 +7,7 @@ from src.api.dependencies import PaginationDep
 from src.database import async_session_maker
 from src.repositories.hotels import HotelsRepository
 
-router = APIRouter(prefix="/hotels")
+router = APIRouter(prefix="/hotels", tags=["Hotels API"])
 
 
 @router.get("")
