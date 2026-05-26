@@ -4,7 +4,7 @@ from src.schemas.users import UserRequestAdd, UserAdd, UserLogin
 from src.database import async_session_maker
 from src.repositories.users import UsersRepository
 from src.services.auth import AuthService
-from src.api.dependencies import UserIdDep
+from src.api.dependencies import UserIdDep, DBDep
 
 
 router = APIRouter(prefix="/auth", tags=["Auth API"])
@@ -13,6 +13,7 @@ router = APIRouter(prefix="/auth", tags=["Auth API"])
 @router.post("/register")
 async def register_user(
     data: UserRequestAdd,
+    db: DBDep,
 ):
     hashed_password = AuthService().hash_password(data.password)
     new_user_data = UserAdd(
@@ -21,9 +22,9 @@ async def register_user(
         email=data.email,
         hashed_password=hashed_password,
     )
-    async with async_session_maker() as session:
-        await UsersRepository(session).add(new_user_data)
-        await session.commit()
+    
+    await db.users.add(new_user_data)
+    await db.commit()
 
     return {"status": "Succesfully registered new user"}
 
@@ -32,9 +33,9 @@ async def register_user(
 async def login_user(
     data: UserLogin,
     response: Response,
+    db: DBDep,
 ):
-    async with async_session_maker() as session:
-        user = await UsersRepository(session).get_user_with_hashed_pass(email=data.email)
+        user = await db.users.get_user_with_hashed_pass(email=data.email)
 
         if not user:
             raise HTTPException(status_code=401, detail="Change your email")
@@ -49,19 +50,22 @@ async def login_user(
     
 
 @router.delete("/{user_id}")
-async def delete_user(user_id: int):
-    async with async_session_maker() as session:
-        await UsersRepository(session).delete(id=user_id)
-        await session.commit()
-        return {"status": "User was succesfully deleted"}
+async def delete_user(
+    user_id: int,
+    db: DBDep,
+):  
+    await db.users.delete(id=user_id)
+    await db.commit()
+
+    return {"status": "User was succesfully deleted"}
     
 
 @router.get("/me")
-async def get_me(user_id: UserIdDep):
-    async with async_session_maker() as session:
-        user = await UsersRepository(session).get_one_or_none(id=user_id)
-
-        return user
+async def get_me(
+    user_id: UserIdDep,
+    db: DBDep,
+):  
+    return await db.users.get_one_or_none(id=user_id)
 
 
 @router.post("/logout")

@@ -47,11 +47,11 @@ async def edit_rooms(
     hotel_id: int,
     room_id: int,
     room_data: RoomsAddRequest,
+    db: DBDep,
 ):
     _room_data = RoomsAdd(hotel_id=hotel_id, **room_data.model_dump())
-    async with async_session_maker() as session:
-        await RoomsRepository(session).edit(_room_data, id=room_id, hotel_id=hotel_id)
-        await session.commit()
+    await db.rooms.edit(_room_data, id=room_id, hotel_id=hotel_id)
+    await db.commit()
 
     return {"status": "Room successfully edited"}
 
@@ -60,11 +60,12 @@ async def partially_edit_room(
     hotel_id: int, 
     room_id: int,
     room_data: RoomsPatchRequest,
+    db: DBDep,
 ):
     _room_data = RoomsPatch(hotel_id=hotel_id, **room_data.model_dump())
-    async with async_session_maker() as session:
-        await RoomsRepository(session).edit(_room_data, is_patch=True, id=room_id, hotel_id=hotel_id)
-        await session.commit()
+
+    await db.rooms.edit(_room_data, is_patch=True, id=room_id, hotel_id=hotel_id)
+    await db.commit()
 
     return {"status": "Room successfully edited"}
 
@@ -72,9 +73,9 @@ async def partially_edit_room(
 async def delete_room(
     hotel_id: int,
     room_id: int,
+    db: DBDep,
 ):
-    async with async_session_maker() as session:
-        await RoomsRepository(session).delete(id=room_id, hotel_id=hotel_id)
-        await session.commit()
+    await db.rooms.delete(id=room_id, hotel_id=hotel_id)
+    await db.commit()
 
     return {"status": "Room successfully deleted"}
