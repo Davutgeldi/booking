@@ -1,6 +1,6 @@
 from datetime import date
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class BookingsAdd(BaseModel):
@@ -20,3 +20,9 @@ class BookingsAddRequest(BaseModel):
 class Bookings(BookingsAdd):
     id: int
     
+
+class BookingsPatch(BaseModel):
+    room_id: int | None = Field(default=None, description="Room ID")
+    date_from: date | None = Field(default=None, description="Date from")
+    date_to: date | None = Field(default=None, description="Date to")
+    price: float | None = Field(default=None, description="Price of the booking")
