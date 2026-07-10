@@ -7,3 +7,6 @@ from src.repositories.mappers.mappers import BookingDataMapper
 class BookingsRepository(BaseRepository):
     model = BookingsOrm
     mapper = BookingDataMapper
+
+
+    
