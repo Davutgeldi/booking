@@ -15,13 +15,16 @@ async def register_user(
     data: UserRequestAdd,
     db: DBDep,
 ):
-    hashed_password = AuthService().hash_password(data.password)
-    new_user_data = UserAdd(
-        first_name=data.first_name,
-        last_name=data.last_name,
-        email=data.email,
-        hashed_password=hashed_password,
-    )
+    try:
+        hashed_password = AuthService().hash_password(data.password)
+        new_user_data = UserAdd(
+            first_name=data.first_name,
+            last_name=data.last_name,
+            email=data.email,
+            hashed_password=hashed_password,
+        )
+    except:
+         raise HTTPException(status_code=400, detail="User exists")
     
     await db.users.add(new_user_data)
     await db.commit()
