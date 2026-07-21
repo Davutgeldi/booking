@@ -16,8 +16,8 @@ class RoomsRepository(BaseRepository):
 
     async def get_filtered_by_time(self, hotel_id: int, date_from: date, date_to: date):
         rooms_ids_to_get = rooms_ids_for_booking(
-            date_from=date_from, 
-            date_to=date_to, 
+            date_from=date_from,
+            date_to=date_to,
             hotel_id=hotel_id,
         )
 
@@ -29,13 +29,14 @@ class RoomsRepository(BaseRepository):
 
         result = await self.session.execute(query)
 
-        return [RoomWithRels.model_validate(model, from_attributes=True) for model in result.scalars().all()]
+        return [
+            RoomWithRels.model_validate(model, from_attributes=True)
+            for model in result.scalars().all()
+        ]
 
     async def get_one_or_none_with_rels(self, **filter_by):
         query = (
-            select(self.model)
-            .options(selectinload(self.model.facilities))
-            .filter_by(**filter_by)
+            select(self.model).options(selectinload(self.model.facilities)).filter_by(**filter_by)
         )
 
         result = await self.session.execute(query)
@@ -43,5 +44,5 @@ class RoomsRepository(BaseRepository):
 
         if model is None:
             return None
-        
+
         return RoomWithRels.model_validate(model, from_attributes=True)

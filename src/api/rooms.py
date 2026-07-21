@@ -19,20 +19,24 @@ async def get_all_rooms(
     per_page = pagination.per_page or 5
     return await db.rooms.get_all(limit=per_page, offset=per_page * (pagination.page - 1))
 
+
 @router.get("/{hotel_id}/rooms")
 async def get_rooms(
-    hotel_id: int, 
+    hotel_id: int,
     db: DBDep,
     date_from: date = Query(None, description="Check in date", example="2026-06-01"),
     date_to: date = Query(None, description="Check out date", example="2026-06-30"),
 ):
-    return await db.rooms.get_filtered_by_time(hotel_id=hotel_id, date_from=date_from, date_to=date_to)
+    return await db.rooms.get_filtered_by_time(
+        hotel_id=hotel_id, date_from=date_from, date_to=date_to
+    )
+
 
 @router.get("/{hotel_id}/rooms/{room_id}")
 async def get_one_room(
-        hotel_id: int,
-        room_id: int, 
-        db: DBDep,
+    hotel_id: int,
+    room_id: int,
+    db: DBDep,
 ):
     room = await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
 
@@ -40,7 +44,8 @@ async def get_one_room(
         return {"status": "Room not found"}
 
     return room
-    
+
+
 @router.post("/{hotel_id}/rooms")
 async def create_room(
     db: DBDep,
@@ -50,28 +55,29 @@ async def create_room(
             "1": {
                 "summary": "Example 1",
                 "value": {
-                    "title":"VIP room for celebrities",
+                    "title": "VIP room for celebrities",
                     "description": None,
                     "price": 69.99,
                     "quantity": 8,
                     "facilities_ids": [1, 2],
-                }
-            } 
+                },
+            }
         }
-    )
+    ),
 ):
     _room_data = RoomsAdd(hotel_id=hotel_id, **rooms_data.model_dump())
     room = await db.rooms.add(_room_data)
 
     rooms_facilities_data = [
-        RoomsFacilityAdd(room_id=room.id, facility_id=facility_id) for facility_id in rooms_data.facilities_ids
+        RoomsFacilityAdd(room_id=room.id, facility_id=facility_id)
+        for facility_id in rooms_data.facilities_ids
     ]
     await db.rooms_facilities.add_bulk(rooms_facilities_data)
-
 
     await db.commit()
 
     return {"status": "Successfully added room", "data": room}
+
 
 @router.put("/{hotel_id}/rooms/{room_id}")
 async def edit_rooms(
@@ -87,9 +93,10 @@ async def edit_rooms(
 
     return {"status": "Room successfully edited"}
 
+
 @router.patch("/{hotel_id}/rooms/{room_id}")
 async def partially_edit_room(
-    hotel_id: int, 
+    hotel_id: int,
     room_id: int,
     room_data: RoomsPatchRequest,
     db: DBDep,
@@ -104,6 +111,7 @@ async def partially_edit_room(
     await db.commit()
 
     return {"status": "Room successfully edited"}
+
 
 @router.delete("/{hotel_id}/rooms/{room_id}")
 async def delete_room(

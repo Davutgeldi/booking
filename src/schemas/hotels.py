@@ -7,7 +7,7 @@ class HotelsAdd(BaseModel):
 
 
 class Hotels(HotelsAdd):
-    id: int 
+    id: int
 
 
 class HotelPatch(BaseModel):

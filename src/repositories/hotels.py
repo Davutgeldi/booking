@@ -7,20 +7,19 @@ from src.repositories.utils import rooms_ids_for_booking
 from src.models.rooms import RoomsOrm
 
 
-
 class HotelsRepository(BaseRepository):
     model = HotelsOrm
     mapper = HotelDataMapper
 
     async def get_all(
-            self, 
-            limit, 
-            offset,
-            title,
-            location,
+        self,
+        limit,
+        offset,
+        title,
+        location,
     ):
         query = select(HotelsOrm)
-        
+
         if title:
             query = query.filter(func.lower(HotelsOrm.title).contains(title.strip().lower()))
         if location:
@@ -30,15 +29,15 @@ class HotelsRepository(BaseRepository):
         result = await self.session.execute(query)
 
         return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
-    
+
     async def get_filtered_by_time(
-            self,
-            date_from,
-            date_to,
-            title, 
-            location,
-            limit, 
-            offset,
+        self,
+        date_from,
+        date_to,
+        title,
+        location,
+        limit,
+        offset,
     ):
         rooms_ids_to_get = rooms_ids_for_booking(date_from=date_from, date_to=date_to)
 
@@ -53,13 +52,9 @@ class HotelsRepository(BaseRepository):
             query = query.filter(func.lower(HotelsOrm.title).contains(title.strip().lower()))
         if location:
             query = query.filter(func.lower(HotelsOrm.location).contains(location.strip().lower()))
-        
-        query = (
-            query
-            .limit(limit)
-            .offset(offset)
-        )
+
+        query = query.limit(limit).offset(offset)
 
         result = await self.session.execute(query)
 
-        return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]    
+        return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]

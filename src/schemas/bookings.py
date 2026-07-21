@@ -19,7 +19,7 @@ class BookingsAddRequest(BaseModel):
 
 class Bookings(BookingsAdd):
     id: int
-    
+
 
 class BookingsPatch(BaseModel):
     room_id: int | None = Field(default=None, description="Room ID")

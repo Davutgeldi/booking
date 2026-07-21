@@ -4,7 +4,7 @@ from src.schemas.facilities import Facility
 
 
 class RoomsAddRequest(BaseModel):
-    title: str 
+    title: str
     description: str | None = None
     price: float
     quantity: int

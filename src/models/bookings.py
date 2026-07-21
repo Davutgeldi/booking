@@ -17,7 +17,6 @@ class BookingsOrm(Base):
     date_to: Mapped[date]
     price: Mapped[float]
 
-
     @hybrid_property
     def total_cost(self):
         return self.price * (self.date_to - self.date_from).days

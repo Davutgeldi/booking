@@ -20,8 +20,8 @@ class BookingsRepository(BaseRepository):
 
     async def add_booking(self, data: BookingsAdd, hotel_id: int):
         rooms_id_to_get = rooms_ids_for_booking(
-            date_from=data.date_from, 
-            date_to=data.date_to, 
+            date_from=data.date_from,
+            date_to=data.date_to,
             hotel_id=hotel_id,
         )
         rooms_ids_to_book_res = await self.session.execute(rooms_id_to_get)
@@ -29,5 +29,5 @@ class BookingsRepository(BaseRepository):
 
         if data.room_id in rooms_ids_to_book:
             new_booking = await self.add(data)
-            
+
             return new_booking

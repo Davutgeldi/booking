@@ -24,11 +24,10 @@ class User(BaseModel):
 
 class UserLogin(BaseModel):
     email: EmailStr
-    password: str   
+    password: str
 
 
 class UserWithHashedPass(BaseModel):
     id: int
     email: EmailStr
-    hashed_password: str 
-
+    hashed_password: str

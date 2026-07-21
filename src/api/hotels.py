@@ -28,6 +28,7 @@ async def get_hotels(
         offset=per_page * (pagination.page - 1),
     )
 
+
 @router.get("/available_hotels")
 @cache(expire=20)
 async def get_available_hotels(
@@ -48,13 +49,15 @@ async def get_available_hotels(
         offset=offset,
     )
 
+
 @router.get("/{hotel_id}")
 async def get_one_hotel(hotel_id: int, db: DBDep):
     hotel = await db.hotels.get_one_or_none(id=hotel_id)
     if hotel is None:
         return {"status": "Hotel doesn't exists"}
-        
+
     return {"data": hotel}
+
 
 @router.post("")
 async def create_hotel(
@@ -66,8 +69,8 @@ async def create_hotel(
                 "value": {"title": "Hotel California", "location": "USA, California"},
             }
         }
-    )
-):  
+    ),
+):
     hotel = await db.hotels.add(hotel_data)
     await db.commit()
 
@@ -82,9 +85,10 @@ async def edit_hotel(
 ):
     await db.hotels.edit(hotel_data, id=hotel_id)
     await db.commit()
-    
+
     return {"status": "Hotel successfully edited"}
-    
+
+
 @router.patch("/{hotel_id}")
 async def partially_edit_hotel(
     hotel_id: int,
@@ -95,6 +99,7 @@ async def partially_edit_hotel(
     await db.commit()
 
     return {"status": "Hotel successfully edited"}
+
 
 @router.delete("/{hotel_id}")
 async def delete_hotel(hotel_id: int, db: DBDep):

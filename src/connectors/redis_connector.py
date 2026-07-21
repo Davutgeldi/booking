@@ -13,7 +13,7 @@ class RedisConnector:
     async def set(self, key: str, value: str, expire: int = None):
         if expire:
             await self.redis.set(key, value, ex=expire)
-        else: 
+        else:
             await self.redis.set(key, value)
 
     async def get(self, key: str):

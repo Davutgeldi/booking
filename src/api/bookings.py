@@ -15,12 +15,12 @@ async def create_booking(
 ):
     room = await db.rooms.get_one_or_none(id=bookings_data.room_id)
 
-    if room is None: 
+    if room is None:
         raise HTTPException(
             status_code=404,
             detail="Room not found",
         )
-    
+
     room_price = room.price
     _booking_data = BookingsAdd(
         user_id=user_id,
@@ -68,9 +68,9 @@ async def partially_edit_booking(
 
 @router.put("/{booking_id}")
 async def edit_booking(
-    booking_id: int, 
+    booking_id: int,
     booking_data: BookingsPatch,
-    db:DBDep,
+    db: DBDep,
 ):
     await db.bookings.edit(booking_data, id=booking_id)
     await db.commit()

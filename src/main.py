@@ -3,9 +3,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import uvicorn
 
-from fastapi_cache import FastAPICache #noqa
-from fastapi_cache.backends.redis import RedisBackend #noqa
-from fastapi_cache.backends.inmemory import InMemoryBackend #noqa
+from fastapi_cache import FastAPICache  # noqa
+from fastapi_cache.backends.redis import RedisBackend  # noqa
+from fastapi_cache.backends.inmemory import InMemoryBackend  # noqa
 
 
 import sys
@@ -24,10 +24,11 @@ from src.api.facilities import router as router_facilities
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await redis_manager.connect()
-    yield 
+    yield
     await redis_manager.close()
 
-#can use this in test mode, redis for test
+
+# can use this in test mode, redis for test
 # if settings.MODE == "TEST":
 #     FastAPICache.init(InMemoryBackend(), prefix="")
 
