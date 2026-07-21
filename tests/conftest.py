@@ -1,14 +1,16 @@
+# ruff: noqa: E402
+
 import pytest
 import json
 from unittest import mock
 
 
-mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
+mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start() 
 
 
-from httpx import AsyncClient, ASGITransport
+from httpx import AsyncClient, ASGITransport 
 from src.database import Base, engine_null_pool
-from src.models import *
+from src.models import * 
 from src.schemas.hotels import HotelsAdd
 from src.schemas.rooms import RoomsAdd
 from src.config import settings
@@ -29,7 +31,7 @@ async def get_db_null_pool():
 
 
 @pytest.fixture
-async def db() -> DBManager:
+async def db() -> DBManager: 
     async for db in get_db_null_pool():
         yield db
 

@@ -3,9 +3,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 import uvicorn
 
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
-from fastapi_cache.backends.inmemory import InMemoryBackend
+from fastapi_cache import FastAPICache #noqa
+from fastapi_cache.backends.redis import RedisBackend #noqa
+from fastapi_cache.backends.inmemory import InMemoryBackend #noqa
 
 
 import sys
@@ -19,7 +19,6 @@ from src.api.auth import router as router_auth
 from src.api.rooms import router as router_rooms
 from src.api.bookings import router as router_bookings
 from src.api.facilities import router as router_facilities
-from src.config import settings
 
 
 @asynccontextmanager

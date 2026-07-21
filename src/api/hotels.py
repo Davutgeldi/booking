@@ -5,10 +5,9 @@ from fastapi import Query
 
 from fastapi_cache.decorator import cache
 
-from src.schemas.hotels import Hotels, HotelPatch, HotelsAdd
+from src.schemas.hotels import HotelPatch, HotelsAdd
 from src.api.dependencies import PaginationDep, DBDep
-from src.database import async_session_maker
-from src.repositories.hotels import HotelsRepository
+
 
 router = APIRouter(prefix="/hotels", tags=["Hotels API"])
 
@@ -52,7 +51,7 @@ async def get_available_hotels(
 @router.get("/{hotel_id}")
 async def get_one_hotel(hotel_id: int, db: DBDep):
     hotel = await db.hotels.get_one_or_none(id=hotel_id)
-    if hotel == None:
+    if hotel is None:
         return {"status": "Hotel doesn't exists"}
         
     return {"data": hotel}

@@ -1,8 +1,6 @@
-from fastapi import APIRouter, HTTPException, Response, Request
+from fastapi import APIRouter, HTTPException, Response
 
 from src.schemas.users import UserRequestAdd, UserAdd, UserLogin
-from src.database import async_session_maker
-from src.repositories.users import UsersRepository
 from src.services.auth import AuthService
 from src.api.dependencies import UserIdDep, DBDep
 
@@ -23,7 +21,7 @@ async def register_user(
             email=data.email,
             hashed_password=hashed_password,
         )
-    except:
+    except: #noqa
          raise HTTPException(status_code=400, detail="User exists")
     
     await db.users.add(new_user_data)
