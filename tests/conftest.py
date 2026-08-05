@@ -32,7 +32,7 @@ async def get_db_null_pool():
 
 
 @pytest.fixture
-async def db() -> AsyncGenerator[DBManager]: 
+async def db() -> AsyncGenerator[DBManager, None]: 
     async for db in get_db_null_pool():
         yield db
 
@@ -61,7 +61,7 @@ async def setup_database(check_test_mode):
 
 
 @pytest.fixture(scope="session")
-async def ac() -> AsyncGenerator[AsyncClient]:
+async def ac() -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
