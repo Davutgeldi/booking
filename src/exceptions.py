@@ -30,8 +30,16 @@ class ObjectNotFoundException(BookingAppException):
     detail = "Object not found"
 
 
+class HotelNotFoundException(BookingAppException):
+    detail = "Hotel not found"
+
+
+class RoomNotFoundException(BookingAppException):
+    detail = "Room not found"
+
+
 class ObjectExistsException(BookingAppException):
-    detail = "Obejct already exists"
+    detail = "Object already exists"
 
 
 class AllRoomsAreBookedException(BookingAppException):

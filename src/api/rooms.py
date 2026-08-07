@@ -6,6 +6,12 @@ from src.api.dependencies import PaginationDep
 from src.schemas.rooms import RoomsAdd, RoomsPatch, RoomsAddRequest, RoomsPatchRequest
 from src.schemas.facilities import RoomsFacilityAdd
 from src.api.dependencies import DBDep
+from src.services.rooms import RoomsService
+from src.exceptions import (
+    RoomNotFoundException,
+    RoomNotFoundHTTPException,
+    HotelNotFoundException,
+)
 from src.exceptions import (
     check_date_to_after_date_from,
     ObjectNotFoundException,
@@ -22,8 +28,7 @@ async def get_all_rooms(
     pagination: PaginationDep,
     db: DBDep,
 ):
-    per_page = pagination.per_page or 5
-    return await db.rooms.get_all(limit=per_page, offset=per_page * (pagination.page - 1))
+    return await RoomsService(db).get_all(pagination=pagination)
 
 
 @router.get("/{hotel_id}/rooms")
@@ -33,10 +38,7 @@ async def get_rooms(
     date_from: date = Query(None, description="Check in date", example="2026-06-01"),
     date_to: date = Query(None, description="Check out date", example="2026-06-30"),
 ):
-    check_date_to_after_date_from(date_from, date_to)
-    return await db.rooms.get_filtered_by_time(
-        hotel_id=hotel_id, date_from=date_from, date_to=date_to
-    )
+    return await RoomsService(db).get_rooms(hotel_id=hotel_id, date_from=date_from, date_to=date_to)
 
 
 @router.get("/{hotel_id}/rooms/{room_id}")
@@ -45,12 +47,10 @@ async def get_one_room(
     room_id: int,
     db: DBDep,
 ):
-    room = await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
-
-    if not room:
+    try:
+        return await RoomsService(db).get_one_room(hotel_id=hotel_id, room_id=room_id)
+    except RoomNotFoundException:
         raise RoomNotFoundHTTPException
-
-    return room
 
 
 @router.post("/{hotel_id}/rooms")
@@ -73,20 +73,9 @@ async def create_room(
     ),
 ):
     try:
-        await db.hotels.get_one(id=hotel_id)
-    except ObjectNotFoundException:
-        raise HotelNotFoundHTTPException
-    
-    _room_data = RoomsAdd(hotel_id=hotel_id, **rooms_data.model_dump())
-    room = await db.rooms.add(_room_data)
-
-    rooms_facilities_data = [
-        RoomsFacilityAdd(room_id=room.id, facility_id=facility_id)
-        for facility_id in rooms_data.facilities_ids
-    ]
-    await db.rooms_facilities.add_bulk(rooms_facilities_data)
-
-    await db.commit()
+        room = await RoomsService(db).add_room(hotel_id=hotel_id, rooms_data=rooms_data)
+    except HotelNotFoundException as ex:
+        raise HotelNotFoundHTTPException from ex
 
     return {"status": "Successfully added room", "data": room}
 
@@ -99,19 +88,9 @@ async def edit_rooms(
     db: DBDep,
 ):
     try:
-        await db.hotels.get_one(id=hotel_id)
-    except ObjectNotFoundException: 
-        raise HotelNotFoundHTTPException
-    
-    try:
-        await db.rooms.get_one(id=room_id)
-    except ObjectNotFoundException:
+        await RoomsService(db).edit_room(hotel_id=hotel_id, room_id=room_id, room_data=room_data)
+    except RoomNotFoundException:
         raise RoomNotFoundHTTPException
-    
-    _room_data = RoomsAdd(hotel_id=hotel_id, **room_data.model_dump())
-    await db.rooms.edit(_room_data, id=room_id, hotel_id=hotel_id)
-    await db.rooms_facilities.set_room_facilities(room_id, room_data.facilities_ids)
-    await db.commit()
 
     return {"status": "Room successfully edited"}
 
@@ -124,23 +103,9 @@ async def partially_edit_room(
     db: DBDep,
 ):
     try:
-        await db.hotels.get_one(id=hotel_id)
-    except ObjectNotFoundException: 
-        raise HotelNotFoundHTTPException
-    
-    try:
-        await db.rooms.get_one(id=room_id)
-    except ObjectNotFoundException:
+        await RoomsService(db).edit_room_partially(hotel_id=hotel_id, room_id=room_id, room_data=room_data)
+    except RoomNotFoundException:
         raise RoomNotFoundHTTPException
-    
-    _room_data_dict = room_data.model_dump(exclude_unset=True)
-    _room_data = RoomsPatch(hotel_id=hotel_id, **_room_data_dict)
-
-    if "facilities_ids" in _room_data_dict:
-        await db.rooms_facilities.set_room_facilities(room_id, _room_data_dict["facilities_ids"])
-
-    await db.rooms.edit(_room_data, is_patch=True, id=room_id, hotel_id=hotel_id)
-    await db.commit()
 
     return {"status": "Room successfully edited"}
 
