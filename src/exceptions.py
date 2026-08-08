@@ -38,15 +38,46 @@ class RoomNotFoundException(BookingAppException):
     detail = "Room not found"
 
 
+class UserNotFoundException(BookingAppException):
+    detail = "User not found"
+
+
 class ObjectExistsException(BookingAppException):
     detail = "Object already exists"
 
 
 class AllRoomsAreBookedException(BookingAppException):
     detail = "All rooms are already booked"
+
+
+class UserAlreadyExistsException(BookingAppException):
+    detail = "User with this email already exists"
+
+
+class EmailNotRegisteredException(BookingAppException):
+    detail = "Email is not registered"
+
+
+class IncorrectPasswordException(BookingAppException):
+    detail = "Password is incorrect"
+
+
+class EmailNotRegisteredHTTPException(BookingAppHTTPException):
+    status_code = 401
+    detail = "Email is not registered"
+
+
+class UserNotFoundHTTPException(BookingAppHTTPException):
+    status_code = 404
+    detail = "User not found"
+
+
+class IncorrectPasswordHTTPException(BookingAppHTTPException):
+    status_code = 401
+    detail = "Password is incorrect"
     
 
-class UserExistsException(BookingAppHTTPException):
+class UserExistsHTTPException(BookingAppHTTPException):
     status_code = 409
     detail = "User with this email exists"
 
