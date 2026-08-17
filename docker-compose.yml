@@ -1,0 +1,28 @@
+services:
+  booking_back:
+    container_name: booking_back
+    build:
+      context: .
+    ports:
+      - "8080:8000"
+    networks:
+      - bookingNetwork
+    env_file:
+      - .env
+
+
+
+
+  booking_celery_worker:
+    container_name: booking_celery_worker
+    build:
+      context: .
+    networks:
+      - bookingNetwork
+    command: "uv run celery --app=src.tasks.celery_app:celery_instance worker -l INFO"
+    env_file:
+      - .env
+
+networks:
+  bookingNetwork:
+    external: true

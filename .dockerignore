@@ -1,0 +1,8 @@
+.env
+venv
+.venv
+__pycache__
+.idea
+.pytest_cache
+.test.env
+.ruff_cache
